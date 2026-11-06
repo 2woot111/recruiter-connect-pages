@@ -1,45 +1,88 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Connect Google to Recruiter</title>
-  <meta property="og:title" content="Connect Google to Recruiter">
-  <meta property="og:site_name" content="Series Recruiter">
-  <meta property="og:description" content="Connect Google Workspace read-only to Series Recruiter.">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connect Google</title>
+  <meta property="og:title" content="Connect Google">
+  <meta property="og:site_name" content="Series">
+  <meta property="og:description" content="Connect Google Workspace read-only to Series Recruiter. Review the Terms and Privacy Policy, then continue.">
   <meta property="og:image" content="https://2woot111.github.io/recruiter-connect-pages/og-logo.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://2woot111.github.io/recruiter-connect-pages/connect.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Connect Google to Recruiter">
+  <meta name="twitter:title" content="Connect Google">
   <meta name="twitter:image" content="https://2woot111.github.io/recruiter-connect-pages/og-logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-family:-apple-system,Helvetica,sans-serif}a{color:#fff}</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <p id="msg">Connecting you to Google…</p>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Series Recruiter (Demo)</p>
+      <h1>Connect Google</h1>
+      <p class="meta">Read-only Google Workspace access · Series Inc.</p>
+    </header>
+
+    <div class="summary">
+      <p>You’re about to connect Google Workspace so Series Recruiter (Demo) can understand your work context and show how we source people through who you know and who Series knows.</p>
+      <p>Access is <strong>read-only</strong>. We will not send email, create events, or change anything in your account. Talent we showcase is anonymized — we never reveal a person’s real name.</p>
+    </div>
+
+    <div class="card">
+      <p>Please review:</p>
+      <p>
+        <a href="terms-of-service.html" target="_blank" rel="noopener">Terms of Service</a>
+        &nbsp;·&nbsp;
+        <a href="privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a>
+      </p>
+
+      <label class="check">
+        <input type="checkbox" id="agree" />
+        <span>I have read and agree to the Terms of Service and Privacy Policy, and I consent to Series using read-only access to my Google Workspace for this demo, as described there.</span>
+      </label>
+
+      <button type="button" id="continue" disabled>Agree and continue</button>
+      <p class="note" id="status">Check the box to continue to Google via Composio.</p>
+    </div>
+
+    <p class="note">You can skip this and keep texting the demo without connecting. Text STOP anytime to opt out of messages. Questions: <a href="mailto:sean@series.so">sean@series.so</a>.</p>
+    <footer>© 2026 Series Inc. · +1 (415) 323-8520</footer>
+  </div>
   <script>
     (function () {
-      function safeNext(raw) {
+      var box = document.getElementById("agree");
+      var btn = document.getElementById("continue");
+      var status = document.getElementById("status");
+      var params = new URLSearchParams(window.location.search);
+      var next = params.get("next") || "";
+
+      function allowed(url) {
         try {
-          var u = new URL(String(raw || ""));
-          if (u.protocol === "https:" && /(^|\.)composio\.dev$/i.test(u.hostname)) return u.toString();
-        } catch (e) {}
-        return null;
+          var u = new URL(url);
+          if (u.protocol !== "https:") return false;
+          return /(^|\.)composio\.dev$/i.test(u.hostname);
+        } catch (e) {
+          return false;
+        }
       }
-      var next = safeNext(new URLSearchParams(window.location.search).get("next"));
-      var msg = document.getElementById("msg");
-      if (!next) {
-        msg.textContent = "This connect link is no longer valid.";
-        return;
-      }
-      var a = document.createElement("a");
-      a.href = next;
-      a.textContent = "Continue";
-      msg.textContent = "Connecting you to Google… ";
-      msg.appendChild(a);
-      window.location.replace(next);
+
+      box.addEventListener("change", function () {
+        btn.disabled = !box.checked;
+      });
+
+      btn.addEventListener("click", function () {
+        if (!box.checked) return;
+        try { localStorage.setItem("series_demo_consent", new Date().toISOString()); } catch (e) {}
+        if (allowed(next)) {
+          window.location.href = next;
+          return;
+        }
+        status.textContent = "You're all set. Return to iMessage — we'll send the Google connect link there, or open this page again from the message once the link is ready.";
+        btn.disabled = true;
+        btn.textContent = "Consent saved";
+      });
     })();
   </script>
 </body>
