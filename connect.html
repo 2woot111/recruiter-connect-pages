@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Connect Google to Recruiter</title>
+  <meta property="og:title" content="Connect Google to Recruiter">
+  <meta property="og:site_name" content="Series Recruiter">
+  <meta property="og:description" content="Connect Google Workspace read-only to Series Recruiter.">
+  <meta property="og:image" content="https://2woot111.github.io/recruiter-connect-pages/og-logo.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://2woot111.github.io/recruiter-connect-pages/connect.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Connect Google to Recruiter">
+  <meta name="twitter:image" content="https://2woot111.github.io/recruiter-connect-pages/og-logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-family:-apple-system,Helvetica,sans-serif}a{color:#fff}</style>
+</head>
+<body>
+  <p id="msg">Connecting you to Google…</p>
+  <script>
+    (function () {
+      function safeNext(raw) {
+        try {
+          var u = new URL(String(raw || ""));
+          if (u.protocol === "https:" && /(^|\.)composio\.dev$/i.test(u.hostname)) return u.toString();
+        } catch (e) {}
+        return null;
+      }
+      var next = safeNext(new URLSearchParams(window.location.search).get("next"));
+      var msg = document.getElementById("msg");
+      if (!next) {
+        msg.textContent = "This connect link is no longer valid.";
+        return;
+      }
+      var a = document.createElement("a");
+      a.href = next;
+      a.textContent = "Continue";
+      msg.textContent = "Connecting you to Google… ";
+      msg.appendChild(a);
+      window.location.replace(next);
+    })();
+  </script>
+</body>
+</html>
