@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Complete Profile</title>
+  <meta property="og:title" content="Complete Profile">
+  <meta property="og:site_name" content="Series">
+  <meta property="og:description" content="Add your title and company so Series Recruiter can describe you accurately in every role brief and Share.">
+  <meta property="og:image" content="https://2woot111.github.io/recruiter-connect-pages/og-icon.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://2woot111.github.io/recruiter-connect-pages/complete-profile.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Complete Profile">
+  <meta name="twitter:image" content="https://2woot111.github.io/recruiter-connect-pages/og-icon.png">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="eyebrow">Series Recruiter (Demo)</p>
+      <h1>Complete Profile</h1>
+      <p class="meta">So we can describe your company accurately in role briefs and Shares.</p>
+    </header>
+
+    <form id="profile-form" class="card" method="POST" action="https://PROFILE_SUBMIT_HOST/api/complete-profile">
+      <input type="hidden" name="chat" id="chat" value="" />
+
+      <label class="field" for="name">Name</label>
+      <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" />
+
+      <label class="field" for="title">Title</label>
+      <input id="title" name="title" type="text" autocomplete="organization-title" placeholder="e.g. Head of Talent" required />
+
+      <label class="field" for="linkedin">LinkedIn URL</label>
+      <input id="linkedin" name="linkedin" type="url" inputmode="url" placeholder="https://www.linkedin.com/in/you" />
+
+      <h2>Company profile</h2>
+      <p class="hint" id="company-hint">Your Series agent uses this to describe your company accurately in every role brief and Share.</p>
+
+      <label class="field" for="company">Company name</label>
+      <input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company" required />
+
+      <label class="field" for="industry">Industry</label>
+      <input id="industry" name="industry" type="text" placeholder="e.g. Developer tools" />
+
+      <label class="field" for="location">Location</label>
+      <input id="location" name="location" type="text" autocomplete="address-level2" placeholder="e.g. New York, NY" />
+
+      <label class="field" for="website">Website</label>
+      <input id="website" name="website" type="url" inputmode="url" placeholder="https://yourcompany.com" />
+
+      <label class="field" for="about">About</label>
+      <textarea id="about" name="about" rows="4" placeholder="A short description of what you build and who you hire for."></textarea>
+
+      <button type="submit" id="submit">Submit</button>
+      <p class="note">This saves your profile privately so Recruiter can describe your company accurately. Nothing is posted publicly.</p>
+    </form>
+
+    <p class="note">Questions: <a href="mailto:sean@series.so">sean@series.so</a>. Text STOP anytime to opt out.</p>
+    <footer>© 2026 Series Inc. · +1 (415) 323-8520</footer>
+  </div>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var chat = document.getElementById("chat");
+      if (chat) chat.value = params.get("chat") || "";
+      var company = document.getElementById("company");
+      var hint = document.getElementById("company-hint");
+      function updateHint() {
+        var name = (company.value || "").trim();
+        hint.textContent = name
+          ? "Your Series agent uses this to describe " + name + " accurately in every role brief and Share."
+          : "Your Series agent uses this to describe your company accurately in every role brief and Share.";
+      }
+      company.addEventListener("input", updateHint);
+    })();
+  </script>
+</body>
+</html>
