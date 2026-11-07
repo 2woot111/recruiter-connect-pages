@@ -16,6 +16,22 @@
   <meta name="twitter:title" content="Complete Profile">
   <meta name="twitter:image" content="https://2woot111.github.io/recruiter-connect-pages/og-icon.png">
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .confirm { text-align: center; }
+    .saved-check {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #111;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      line-height: 1;
+    }
+    #saved[hidden], #profile-form[hidden] { display: none !important; }
+  </style>
 </head>
 <body>
   <div class="wrap">
@@ -25,43 +41,45 @@
       <p class="meta">So we can describe your company accurately in role briefs and Shares.</p>
     </header>
 
-    <form id="profile-form" class="card" novalidate>
+    <iframe name="hidden_iframe" id="hidden_iframe" title="Saving profile" style="display:none"></iframe>
+    <form id="profile-form" class="card" method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSeIJHZp71iMjzY5HrZdOUs_oD6sE7v-QDX545P1oRecV_lPXQ/formResponse" target="hidden_iframe">
+      <input type="hidden" name="entry.640947610" id="chat" value="" />
+
       <label class="field" for="name">Name</label>
-      <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" />
+      <input id="name" name="entry.226756518" type="text" autocomplete="name" placeholder="Your name" />
 
       <label class="field" for="title">Title</label>
-      <input id="title" name="title" type="text" autocomplete="organization-title" placeholder="e.g. Head of Talent" required />
+      <input id="title" name="entry.1486426737" type="text" autocomplete="organization-title" placeholder="e.g. Head of Talent" required />
 
       <label class="field" for="linkedin">LinkedIn URL</label>
-      <input id="linkedin" name="linkedin" type="url" inputmode="url" placeholder="https://www.linkedin.com/in/you" />
+      <input id="linkedin" name="entry.1294548522" type="url" inputmode="url" placeholder="https://www.linkedin.com/in/you" />
 
       <h2>Company profile</h2>
       <p class="hint" id="company-hint">Your Series agent uses this to describe your company accurately in every role brief and Share.</p>
 
       <label class="field" for="company">Company name</label>
-      <input id="company" name="company" type="text" autocomplete="organization" placeholder="Your company" required />
+      <input id="company" name="entry.1432303552" type="text" autocomplete="organization" placeholder="Your company" required />
 
       <label class="field" for="industry">Industry</label>
-      <input id="industry" name="industry" type="text" placeholder="e.g. Developer tools" />
+      <input id="industry" name="entry.1330483364" type="text" placeholder="e.g. Developer tools" />
 
       <label class="field" for="location">Location</label>
-      <input id="location" name="location" type="text" autocomplete="address-level2" placeholder="e.g. New York, NY" />
+      <input id="location" name="entry.888111202" type="text" autocomplete="address-level2" placeholder="e.g. New York, NY" />
 
       <label class="field" for="website">Website</label>
-      <input id="website" name="website" type="url" inputmode="url" placeholder="https://yourcompany.com" />
+      <input id="website" name="entry.379556295" type="url" inputmode="url" placeholder="https://yourcompany.com" />
 
       <label class="field" for="about">About</label>
-      <textarea id="about" name="about" rows="4" placeholder="A short description of what you build and who you hire for."></textarea>
+      <textarea id="about" name="entry.1840887931" rows="4" placeholder="A short description of what you build and who you hire for."></textarea>
 
-      <button type="submit" id="submit">Send to Recruiter</button>
-      <p class="note">This opens iMessage with a short summary so Recruiter can save it and keep going. Nothing is posted publicly.</p>
+      <button type="submit" id="submit">Submit</button>
+      <p class="note">This saves your profile privately so Recruiter can describe your company accurately. Nothing is posted publicly.</p>
     </form>
 
-    <div id="done" class="card" hidden>
-      <p>Your profile is ready to send. If iMessage didn’t open, copy the text below and paste it to Series Recruiter.</p>
-      <textarea id="payload" rows="10" readonly></textarea>
-      <a class="btn" id="imessage" href="sms:+14153238520">Go back to iMessage</a>
-      <p class="note"><a href="https://bcrw.apple.com/sms:open?service=iMessage&amp;recipient=+14153238520">Open Recruiter in Messages</a></p>
+    <div id="saved" class="card confirm" hidden>
+      <div class="saved-check" aria-hidden="true">✓</div>
+      <p id="saved-msg">Your profile is saved. Recruiter has it.</p>
+      <a class="btn" href="sms:+14153238520">Go back to iMessage</a>
     </div>
 
     <p class="note">Questions: <a href="mailto:sean@series.so">sean@series.so</a>. Text STOP anytime to opt out.</p>
@@ -69,12 +87,16 @@
   </div>
   <script>
     (function () {
-      var form = document.getElementById("profile-form");
-      var done = document.getElementById("done");
-      var payload = document.getElementById("payload");
-      var imessage = document.getElementById("imessage");
+      var params = new URLSearchParams(window.location.search);
+      var chat = document.getElementById("chat");
+      if (chat) chat.value = params.get("chat") || "";
       var company = document.getElementById("company");
       var hint = document.getElementById("company-hint");
+      var form = document.getElementById("profile-form");
+      var saved = document.getElementById("saved");
+      var savedMsg = document.getElementById("saved-msg");
+      var iframe = document.getElementById("hidden_iframe");
+      var submitted = false;
 
       function updateHint() {
         var name = (company.value || "").trim();
@@ -84,34 +106,22 @@
       }
       company.addEventListener("input", updateHint);
 
-      function val(id) { return (document.getElementById(id).value || "").trim(); }
-
-      form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        var title = val("title");
-        var companyName = val("company");
-        if (!title || !companyName) {
-          form.reportValidity();
-          return;
-        }
-        var about = val("about");
-        if (about.length > 600) about = about.slice(0, 597) + "...";
-        var lines = ["Complete Profile"];
-        if (val("name")) lines.push("Name: " + val("name"));
-        lines.push("Title: " + title);
-        if (val("linkedin")) lines.push("LinkedIn: " + val("linkedin"));
-        lines.push("Company name: " + companyName);
-        if (val("industry")) lines.push("Industry: " + val("industry"));
-        if (val("location")) lines.push("Location: " + val("location"));
-        if (val("website")) lines.push("Website: " + val("website"));
-        if (about) lines.push("About: " + about);
-        var body = lines.join("\n");
-        payload.value = body;
-        var sms = "sms:+14153238520&body=" + encodeURIComponent(body);
-        imessage.href = sms;
+      function showSaved() {
+        var name = (company.value || "").trim();
+        savedMsg.textContent = name
+          ? "Your profile is saved for " + name + ". Recruiter has it."
+          : "Your profile is saved. Recruiter has it.";
         form.hidden = true;
-        done.hidden = false;
-        window.location.href = sms;
+        saved.hidden = false;
+        setTimeout(function () { window.location.href = "sms:+14153238520"; }, 800);
+      }
+
+      form.addEventListener("submit", function () {
+        submitted = true;
+      });
+      iframe.addEventListener("load", function () {
+        if (!submitted) return;
+        showSaved();
       });
     })();
   </script>
