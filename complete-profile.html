@@ -79,7 +79,10 @@
     <div id="saved" class="card confirm" hidden>
       <div class="saved-check" aria-hidden="true">✓</div>
       <p id="saved-msg">Your profile is saved. Recruiter has it.</p>
-      <a class="btn" href="sms:+14153238520">Go back to iMessage</a>
+      <!-- Opens the chat with the text field prefilled: "Complete my profile, what now?" (iMessage can't auto-send; the user taps Send and the bot continues the flow).
+           iOS/macOS form:  sms:+14153238520&body=...      compatibility fallback:  sms:+14153238520?&body=...      (RFC 5724 / Android: sms:+14153238520?body=...) -->
+      <a class="btn" id="back-to-messages" href="sms:+14153238520&body=Complete%20my%20profile%2C%20what%20now%3F">Go back to iMessage</a>
+      <p class="note"><a id="back-to-messages-fallback" href="sms:+14153238520?&body=Complete%20my%20profile%2C%20what%20now%3F">Messages didn't open? Tap here.</a></p>
     </div>
 
     <p class="note">Questions: <a href="mailto:sean@series.so">sean@series.so</a>. Text STOP anytime to opt out.</p>
@@ -113,7 +116,7 @@
           : "Your profile is saved. Recruiter has it.";
         form.hidden = true;
         saved.hidden = false;
-        setTimeout(function () { window.location.href = "sms:+14153238520"; }, 800);
+        setTimeout(function () { window.location.href = "sms:+14153238520&body=Complete%20my%20profile%2C%20what%20now%3F"; }, 800);
       }
 
       form.addEventListener("submit", function () {
